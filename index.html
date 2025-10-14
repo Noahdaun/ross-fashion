@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title> Ross Wears Rachel's New Shirt </title>
+  <style>
+    body { margin:0; font-family:sans-serif; background:#f5f8fa; color:#232340; }
+    .container {
+      max-width: 440px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      transition: all .2s;
+      min-height: 100vh;
+      background: #f5f8fa;
+    }
+    .container.horizontal {
+      max-width: 100vw;
+      margin: 0;
+      flex-direction: row;
+      min-height: 100vh;
+      height: 100vh;
+      background: #f5f8fa;
+    }
+    .left-panel {
+  width: 40%;
+  min-width: 320px;
+  background: #f5f8fa;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  position: sticky;
+  top: 0;
+  align-self: flex-start;
+  height: 100vh;
+  z-index: 100;
+}
+
+    .right-panel {
+      width: 60%;
+      background: #f9fafb;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: stretch;
+      border-left: 2px solid #dbeafe;
+      min-height: 0;
+      height: 100vh;
+      overflow-y: auto;
+      padding: 0;
+    }
+    #fixed-top-group, #fixed-top-group-vert {
+      width: 100%;
+      background: #f5f8fa;
+      box-shadow: 0 4px 16px #d5dae533;
+      border-radius: 0 0 18px 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      padding-bottom: 12px;
+    }
+    #player, #player-vert {
+      width: 100%;
+      aspect-ratio: 16/9;
+      border: none;
+      border-radius: 18px 18px 0 0;
+      background: #000;
+      box-shadow: 0 2px 10px #cdd4e7;
+      display: block;
+      max-width: 640px;
+      margin: 0 auto;
+    }
+    #fixed-controls, #fixed-controls-vert {
+      width: 100%;
+      background: #f5f8fa;
+      border-radius: 0 0 18px 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      padding-bottom: 4px;
+    }
+    #progress, #progress-vert {
+      margin:12px 18px 8px 18px;
+      font-size:17px;
+      font-weight:500;
+      text-align:right;
+    }
+    #controls, #controls-vert {
+      display:flex;
+      gap:10px;
+      margin:0 18px 10px 18px;
+      align-items:center;
+      justify-content:center;
+    }
+    #controls button, #controls-vert button {
+      font-size:15px; padding:7px 14px; border-radius:10px; border:none;
+      background:#dbeafe; color:#232340; cursor:pointer;
+      transition: .13s;
+      white-space: nowrap;
+    }
+    #controls button.active, #controls-vert button.active { background:#232340; color:#fff; }
+    #mode-btn, #layout-btn, #mode-btn-vert, #layout-btn-vert {
+      font-size:14px; padding:6px 12px; border-radius:9px; border:none;
+      background:#fed7aa; color:#c2410c; cursor:pointer; margin-left:8px;
+      white-space: nowrap;
+    }
+    #mode-btn.active, #layout-btn.active, #mode-btn-vert.active, #layout-btn-vert.active { background:#c2410c; color:#fff;}
+    #subs-vert {
+      display:flex; flex-direction:column; gap:12px;
+      padding:0 0 24px 0;
+      width: 100%;
+      align-items: center;
+      flex: 1;
+      overflow-y: auto;
+      max-height: calc(100vh - 330px);
+      min-height: 0;
+    }
+    #subs {
+      display:flex; flex-direction:column; gap:12px;
+      padding:0 0 24px 0;
+      width: 100%;
+      align-items: stretch;
+    }
+    .sub-row {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      max-width: 100vw;
+      min-width: 0;
+      gap: 10px;
+      box-sizing: border-box;
+      margin: 0 auto;
+      transition: outline 0.15s, box-shadow 0.15s;
+    }
+    .sub-row.active {
+      outline: 3px solid #3b82f6 !important;
+      border-radius: 16px;
+      box-shadow: 0 0 0 2px #93c5fd66;
+      z-index: 1;
+    }
+    .sub-btn {
+      flex: 1 1 0%;
+      min-width: 0;
+      max-width: 100%;
+      font-size: 18px;
+      padding: 16px;
+      border-radius: 14px;
+      border: none;
+      background: #e0e7ff;
+      color: #232340;
+      text-align: left;
+      transition: .13s;
+      white-space: normal;
+      line-height: 1.3;
+      word-break: break-word;
+      overflow-wrap: break-word;
+      box-sizing: border-box;
+    }
+    .hide-btn, .check-btn {
+      flex-shrink: 0;
+      min-width: 44px;
+      max-width: 44px;
+      height: 44px;
+      font-size: 24px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+    }
+    .container.horizontal .sub-btn {
+      font-size: 30px;
+      padding: 18px 32px;
+    }
+    .container.horizontal .hide-btn,
+    .container.horizontal .check-btn {
+      font-size: 30px;
+      min-width: 52px;
+      max-width: 52px;
+      height: 52px;
+    }
+    .sub-btn:active { background:#a5b4fc; }
+    .sub-btn.learned { background:#a7f3d0; color:#157348; text-decoration:line-through; }
+    .hide-btn.active { color:#3b3b3b; }
+    .check-btn.checked { color:#22c55e; }
+    #vertical-root {
+      width: 100%;
+      max-width: 440px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: #f5f8fa;
+      height: 100vh;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+    #fixed-top-group-vert {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: #f5f8fa;
+    }
+    @media (max-width: 900px) {
+      .container.horizontal .left-panel, .container.horizontal .right-panel { width: 100%; min-width:0;}
+      .container.horizontal { flex-direction: column; }
+    }
+    @media (max-width: 520px) {
+      .container, .container.horizontal { flex-direction: column !important; max-width: 100vw !important; }
+      .left-panel, .right-panel { width: 100% !important; min-width:0;}
+      #fixed-top-group, #fixed-top-group-vert { border-radius:0 0 14px 14px; }
+      #player, #player-vert { border-radius:0;}
+      #fixed-controls, #fixed-controls-vert { border-radius:0 0 14px 14px;}
+      .sub-btn { font-size:15px; padding:12px;}
+      #progress, #progress-vert { font-size:14px;}
+      #vertical-root { max-width: 100vw; }
+      .sub-row { max-width: 100vw; }
+      .sub-btn { max-width: 98vw; }
+      .container.horizontal .sub-btn { font-size: 18px; }
+      .container.horizontal .hide-btn, .container.horizontal .check-btn { font-size: 18px; }
+    }
+  </style>
+</head>
+<body>
+<div class="container" id="container">
+  <!-- 가로모드(좌우) 패널 -->
+  <div class="left-panel" id="left-panel" style="display:none">
+    <div id="fixed-top-group">
+      <iframe id="player" src="https://www.youtube.com/embed/feY4gAj1mks?enablejsapi=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+      <div id="fixed-controls">
+        <div id="progress"></div>
+        <div id="controls">
+          <button id="show-all" class="active">전체 보기</button>
+          <button id="show-learned">외웠음 보기</button>
+          <button id="mode-btn" class="active">한줄 재생</button>
+          <button id="layout-btn" title="세로모드로 전환">세로모드</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="right-panel" id="right-panel" style="display:none">
+    <div id="subs"></div>
+  </div>
+  <!-- 세로모드 패널 -->
+  <div id="vertical-root">
+    <div id="fixed-top-group-vert">
+      <iframe id="player-vert" src="https://www.youtube.com/embed/feY4gAj1mks?enablejsapi=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+      <div id="fixed-controls-vert">
+        <div id="progress-vert"></div>
+        <div id="controls-vert">
+          <button id="show-all-vert" class="active">전체 보기</button>
+          <button id="show-learned-vert">외웠음 보기</button>
+          <button id="mode-btn-vert" class="active">한줄 재생</button>
+          <button id="layout-btn-vert" title="가로모드로 전환">가로모드</button>
+        </div>
+      </div>
+    </div>
+    <div id="subs-vert"></div>
+  </div>
+</div>
+<script>
+const SUBS = [
+  {
+    "text": "I need some fashion advice.",
+    "start": 2.484,
+    "end": 4.133
+  },
+  {
+    "text": "How does this look?",
+    "start": 5.824,
+    "end": 6.911
+  },
+  {
+    "text": "Well, it's... It's a little low. Pick it up a little.",
+    "start": 13.44,
+    "end": 15.887
+  },
+  {
+    "text": "A little bit more.",
+    "start": 17.279,
+    "end": 18.372
+  },
+  {
+    "text": "A little bit more. There you go.",
+    "start": 19.199,
+    "end": 21.66
+  },
+  {
+    "text": "Now throw it away.",
+    "start": 24.0,
+    "end": 25.055
+  },
+  {
+    "text": "Come on! This looks good.",
+    "start": 26.56,
+    "end": 28.384
+  },
+  {
+    "text": "Ross, please trust me.",
+    "start": 28.385,
+    "end": 29.536
+  },
+  {
+    "text": "I buy 30 fashion magazines a month.",
+    "start": 29.537,
+    "end": 31.803
+  },
+  {
+    "text": "Now, I don't know who's running for president or who that NATO guy is...",
+    "start": 32.065,
+    "end": 35.683
+  },
+  {
+    "text": "but I do know that you have to get far away from that hat.",
+    "start": 36.289,
+    "end": 38.407
+  },
+  {
+    "text": "Damn it.",
+    "start": 39.6,
+    "end": 40.642
+  },
+  {
+    "text": "I have this date tomorrow night, and I have to look cool.",
+    "start": 41.182,
+    "end": 44.396
+  },
+  {
+    "text": "If you want fashion help, Rachel and I are going shopping tomorrow.",
+    "start": 44.881,
+    "end": 47.799
+  },
+  {
+    "text": "You're welcome to come with us.",
+    "start": 47.8,
+    "end": 49.538
+  },
+  {
+    "text": "Really? That would be great. Uh, I mean, I have to do something.",
+    "start": 49.539,
+    "end": 52.509
+  },
+  {
+    "text": "She kind of teased me about how I dress.",
+    "start": 52.51,
+    "end": 54.525
+  },
+  {
+    "text": "I can see why. Nice shirt.",
+    "start": 54.526,
+    "end": 56.532
+  },
+  {
+    "text": "You're wearing the same shirt.",
+    "start": 57.998,
+    "end": 59.411
+  },
+  {
+    "text": "Stupid Gap on every corner!",
+    "start": 62.719,
+    "end": 64.573
+  },
+  {
+    "text": "Oh, this place is great!",
+    "start": 76.56,
+    "end": 78.668
+  },
+  {
+    "text": "come on, I'm not gonna wear any of this.",
+    "start": 81.282,
+    "end": 83.233
+  },
+  {
+    "text": "Nothing silver.",
+    "start": 83.234,
+    "end": 85.04
+  },
+  {
+    "text": "Okay, nothing with hair.",
+    "start": 85.04,
+    "end": 87.079
+  },
+  {
+    "text": "And nothing with padlocks on it!",
+    "start": 87.759,
+    "end": 89.923
+  },
+  {
+    "text": "Look, I know that some of this stuff is out there.",
+    "start": 91.52,
+    "end": 93.591
+  },
+  {
+    "text": "But, I mean, come on,",
+    "start": 93.592,
+    "end": 94.912
+  },
+  {
+    "text": "Just wear what I suggest, and she is gonna go nuts for you.",
+    "start": 156.204,
+    "end": 159.371
+  }
+];
+
+export default SUBS;
+
+
+
+
+
+
+const STORAGE_KEY = 'subStatus_asianfood_yt';
+let status = {};
+let mode = 'vertical'; // vertical | horizontal
+let playingSubIdx = null;
+let pausedSubIdx = null;
+let paused = false;
+let playMode = 'single';
+let timeoutId, player, playerVert, currentView = 'all';
+
+// 추가: 마지막 클릭 자막 index
+let selectedSubIdx = null;
+
+function loadStatus() {
+  try {
+    status = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+    for (let i=0; i<SUBS.length; i++) {
+      if (!status[i]) status[i]={hide:false,learned:false};
+    }
+  } catch { status = {}; }
+}
+function saveStatus() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(status));
+}
+
+function renderSubs(view='all', mode='vertical') {
+  const subsDiv = (mode==='vertical') ? document.getElementById('subs-vert') : document.getElementById('subs');
+  subsDiv.innerHTML = '';
+  let learned = 0;
+  SUBS.forEach((sub, idx) => {
+    if (view==='learned' && !status[idx].learned) return;
+    if (status[idx].learned) learned++;
+    const row = document.createElement('div');
+    row.className = 'sub-row';
+    if (idx === selectedSubIdx) row.className += ' active';
+    const btn = document.createElement('button');
+    btn.className = 'sub-btn' + (status[idx].learned ? ' learned':'');
+    btn.innerText = status[idx].hide ? '🙈' : sub.text;
+    btn.onclick = () => playPauseOrRestartSub(idx, mode);
+    const hideBtn = document.createElement('button');
+    hideBtn.className = 'hide-btn' + (status[idx].hide ? ' active' : '');
+    hideBtn.innerText = '🙈';
+    hideBtn.title = status[idx].hide ? '자막 보이기' : '자막 숨기기';
+    hideBtn.onclick = (e) => {
+      status[idx].hide = !status[idx].hide;
+      saveStatus(); renderSubs(currentView, mode);
+      e.stopPropagation();
+    };
+    const checkBtn = document.createElement('button');
+    checkBtn.className = 'check-btn' + (status[idx].learned ? ' checked':'');
+    checkBtn.innerText = '✔️';
+    checkBtn.title = status[idx].learned ? '외웠음 해제' : '외웠음';
+    checkBtn.onclick = (e) => {
+      status[idx].learned = !status[idx].learned;
+      saveStatus(); renderSubs(currentView, mode);
+      e.stopPropagation();
+    };
+    row.appendChild(btn);
+    row.appendChild(hideBtn);
+    row.appendChild(checkBtn);
+    subsDiv.appendChild(row);
+  });
+  let percent = SUBS.length ? Math.round(learned/SUBS.length*100) : 0;
+  const prog = (mode==='vertical') ? document.getElementById('progress-vert') : document.getElementById('progress');
+  if (prog) prog.innerHTML =
+    `진행률: <b>${percent}%</b> (${learned}/${SUBS.length})`;
+}
+
+function onYouTubeIframeAPIReady() {
+  player = new YT.Player('player');
+  playerVert = new YT.Player('player-vert');
+}
+window.onYouTubeIframeAPIReady = onYouTubeIframeAPIReady;
+
+// 클릭한 자막 줄만 테두리 남기고, 재생이 끝나도 유지
+function playPauseOrRestartSub(idx, mode='vertical') {
+  selectedSubIdx = idx;
+  renderSubs(currentView, mode);
+  const curPlayer = (mode === 'vertical') ? playerVert : player;
+  if (!curPlayer || !curPlayer.seekTo) return;
+  const state = curPlayer.getPlayerState();
+  if (playingSubIdx !== idx) {
+    playSubByMode(idx, mode);
+    playingSubIdx = idx;
+    pausedSubIdx = null;
+    paused = false;
+    return;
+  }
+  if (state === 1) {
+    curPlayer.pauseVideo();
+    if (timeoutId) clearTimeout(timeoutId);
+    paused = true;
+    pausedSubIdx = idx;
+    playingSubIdx = null;
+    return;
+  }
+  if (state === 2 && paused && pausedSubIdx === idx) {
+    playSubByMode(idx, mode);
+    playingSubIdx = idx;
+    paused = false;
+    pausedSubIdx = null;
+    return;
+  }
+  playSubByMode(idx, mode);
+  playingSubIdx = idx;
+  paused = false;
+  pausedSubIdx = null;
+}
+function playSubByMode(idx, mode='vertical') {
+  const curPlayer = (mode === 'vertical') ? playerVert : player;
+  let start = SUBS[idx].start;
+  let end;
+  if (playMode === 'single') {
+    end = SUBS[idx].end;
+  } else {
+    end = (SUBS[idx+1] ? SUBS[idx+1].end : SUBS[idx].end);
+  }
+  curPlayer.seekTo(start, true);
+  curPlayer.playVideo();
+  if (timeoutId) clearTimeout(timeoutId);
+  timeoutId = setTimeout(() => {
+    curPlayer.pauseVideo();
+    playingSubIdx = null;
+    paused = false;
+    pausedSubIdx = null;
+    // 재생 종료 시에도 selectedSubIdx는 그대로, outline 유지!
+  }, (end - start) * 1000);
+}
+function setLayout(newMode) {
+  mode = newMode;
+  const cont = document.getElementById('container');
+  if (mode === 'horizontal') {
+    cont.classList.add('horizontal');
+    document.getElementById('left-panel').style.display = '';
+    document.getElementById('right-panel').style.display = '';
+    document.getElementById('vertical-root').style.display = 'none';
+    renderSubs(currentView, 'horizontal');
+  } else {
+    cont.classList.remove('horizontal');
+    document.getElementById('left-panel').style.display = 'none';
+    document.getElementById('right-panel').style.display = 'none';
+    document.getElementById('vertical-root').style.display = '';
+    renderSubs(currentView, 'vertical');
+  }
+}
+function setHandlers() {
+  // 세로모드
+  document.getElementById('show-all-vert').onclick = function() {
+    currentView='all';
+    this.classList.add('active');
+    document.getElementById('show-learned-vert').classList.remove('active');
+    renderSubs('all', 'vertical');
+  };
+  document.getElementById('show-learned-vert').onclick = function() {
+    currentView='learned';
+    this.classList.add('active');
+    document.getElementById('show-all-vert').classList.remove('active');
+    renderSubs('learned', 'vertical');
+  };
+  document.getElementById('mode-btn-vert').onclick = function() {
+    if (playMode === 'single') {
+      playMode = 'next';
+      this.textContent = '다음줄까지 재생';
+      this.classList.add('active');
+    } else {
+      playMode = 'single';
+      this.textContent = '한줄 재생';
+      this.classList.remove('active');
+    }
+  };
+  document.getElementById('layout-btn-vert').onclick = function() {
+    setLayout('horizontal');
+  };
+  // 가로모드
+  document.getElementById('show-all').onclick = function() {
+    currentView='all';
+    this.classList.add('active');
+    document.getElementById('show-learned').classList.remove('active');
+    renderSubs('all', 'horizontal');
+  };
+  document.getElementById('show-learned').onclick = function() {
+    currentView='learned';
+    this.classList.add('active');
+    document.getElementById('show-all').classList.remove('active');
+    renderSubs('learned', 'horizontal');
+  };
+  document.getElementById('mode-btn').onclick = function() {
+    if (playMode === 'single') {
+      playMode = 'next';
+      this.textContent = '다음줄까지 재생';
+      this.classList.add('active');
+    } else {
+      playMode = 'single';
+      this.textContent = '한줄 재생';
+      this.classList.remove('active');
+    }
+  };
+  document.getElementById('layout-btn').onclick = function() {
+    setLayout('vertical');
+  };
+}
+window.onload = function() {
+  loadStatus();
+  setHandlers();
+  setLayout('vertical'); // 기본 세로모드
+  const tag = document.createElement('script');
+  tag.src = "https://www.youtube.com/iframe_api";
+  document.body.appendChild(tag);
+};
+</script>
+</body>
+</html>
